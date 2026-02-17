@@ -17,7 +17,7 @@ public class Role {
     @Column(nullable = false)
     private RoleName nombre;
 
-    private enum RoleName {
+    public enum RoleName {
         ADMIN, USER
     }
 
