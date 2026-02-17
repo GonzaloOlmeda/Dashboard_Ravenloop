@@ -4,51 +4,68 @@ import es.daw.dashboard.dto.bd.AlertaDTO;
 import es.daw.dashboard.entity.Alerta;
 import es.daw.dashboard.entity.Integracion;
 import es.daw.dashboard.entity.ServidorMV;
-import org.mapstruct.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring")
-public interface AlertaMapper {
+@Component
+@RequiredArgsConstructor
+public class AlertaMapper {
 
     // ENTITY → DTO
-    @Mapping(source = "categoria", target = "categoria")
-    @Mapping(source = "origen", target = "origen", qualifiedByName = "intToString")
-    @Mapping(source = "servidorMv.id", target = "servidorId")
-    @Mapping(source = "servidorMv.nombre", target = "servidorNombre")
-    @Mapping(source = "integracion.id", target = "integracionId")
-    @Mapping(source = "integracion.nombreSistema", target = "integracionNombre")
-    AlertaDTO toDTO(Alerta alerta);
+    public AlertaDTO toDTO(Alerta alerta) {
+        if (alerta == null) return null;
+
+        AlertaDTO dto = new AlertaDTO();
+        dto.setId(alerta.getId());
+        dto.setCategoria(alerta.getCategoria() != null ? alerta.getCategoria().name() : null);
+        dto.setTipo(alerta.getTipo());
+        dto.setMensaje(alerta.getMensaje());
+        dto.setOrigen(alerta.getOrigen() != null ? alerta.getOrigen().toString() : null);
+        dto.setFechaAlerta(alerta.getFechaAlerta());
+
+        // Servidor relacionado
+        if (alerta.getServidorMv() != null) {
+            dto.setServidorId(alerta.getServidorMv().getId());
+            dto.setServidorNombre(alerta.getServidorMv().getNombre());
+        }
+
+        // Integración relacionada
+        if (alerta.getIntegracion() != null) {
+            dto.setIntegracionId(alerta.getIntegracion().getId());
+            dto.setIntegracionNombre(alerta.getIntegracion().getNombreSistema());
+        }
+
+        return dto;
+    }
 
     // DTO → ENTITY
-    @Mapping(source = "categoria", target = "categoria")
-    @Mapping(source = "origen", target = "origen", qualifiedByName = "stringToInt")
-    @Mapping(source = "servidorId", target = "servidorMv", qualifiedByName = "mapServidor")
-    @Mapping(source = "integracionId", target = "integracion", qualifiedByName = "mapIntegracion")
-    Alerta toEntity(AlertaDTO dto);
+    public Alerta toEntity(AlertaDTO dto) {
+        if (dto == null) return null;
 
-    @Named("stringToInt")
-    default Integer stringToInt(String value) {
-        try { return value != null ? Integer.parseInt(value) : null; }
-        catch (NumberFormatException e) { return null; }
-    }
+        Alerta alerta = new Alerta();
+        alerta.setId(dto.getId());
+        alerta.setCategoria(dto.getCategoria() != null ?
+                Alerta.CategoriaAlerta.valueOf(dto.getCategoria()) : null);
+        alerta.setTipo(dto.getTipo());
+        alerta.setMensaje(dto.getMensaje());
+        alerta.setOrigen(dto.getOrigen() != null ? Integer.parseInt(dto.getOrigen()) : null);
+        alerta.setFechaAlerta(dto.getFechaAlerta());
 
-    @Named("intToString")
-    default String intToString(Integer value) {
-        return value != null ? value.toString() : null;
-    }
+        // Servidor relacionado (solo ID)
+        if (dto.getServidorId() != null) {
+            ServidorMV servidor = new ServidorMV();
+            servidor.setId(dto.getServidorId());
+            alerta.setServidorMv(servidor);
+        }
 
-    @Named("mapServidor")
-    default ServidorMV mapServidor(Long id) {
-        if (id == null) return null;
-        ServidorMV s = new ServidorMV();
-        s.setId(id);
-        return s;
-    }
+        // Integración relacionada (solo ID)
+        if (dto.getIntegracionId() != null) {
+            Integracion integracion = new Integracion();
+            integracion.setId(dto.getIntegracionId());
+            alerta.setIntegracion(integracion);
+        }
 
-    @Named("mapIntegracion")
-    default Integracion mapIntegracion(Long id) {
-        if (id == null) return null;
-        Integracion i = new Integracion();
-        i.setId(id);
-        return i;
+        return alerta;
     }
 }
+

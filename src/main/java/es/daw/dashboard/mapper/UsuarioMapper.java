@@ -1,46 +1,75 @@
 package es.daw.dashboard.mapper;
 
 import es.daw.dashboard.dto.bd.UsuarioDTO;
+import es.daw.dashboard.dto.bd.ServidorDTO;
 import es.daw.dashboard.entity.Role;
 import es.daw.dashboard.entity.ServidorMV;
 import es.daw.dashboard.entity.Usuario;
-import org.mapstruct.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", uses = {ServidorMapper.class})
-public interface UsuarioMapper {
+@Component
+@RequiredArgsConstructor
+public class UsuarioMapper {
+
+    private final ServidorMapper servidorMapper;
 
     // ENTITY → DTO
-    @Mapping(source = "role.nombre", target = "role")
-    @Mapping(source = "servidores", target = "servidores", qualifiedByName = "servidoresToOptional")
-    UsuarioDTO toDTO(Usuario usuario);
+    public UsuarioDTO toDTO(Usuario usuario) {
+        if (usuario == null) return null;
+
+        UsuarioDTO dto = new UsuarioDTO();
+        dto.setId(usuario.getId());
+        dto.setNombre(usuario.getNombre());
+        dto.setEmail(usuario.getEmail());
+        dto.setActivo(usuario.getActivo());
+
+        // Role
+        dto.setRole(usuario.getRole() != null ? usuario.getRole().getNombre().name() : null);
+
+        // Servidores (solo uno, porque tu DTO usa Optional)
+        if (usuario.getServidores() != null && !usuario.getServidores().isEmpty()) {
+            ServidorMV servidor = usuario.getServidores().iterator().next();
+            dto.setServidores(Optional.of(servidorMapper.toDTO(servidor)));
+        } else {
+            dto.setServidores(Optional.empty());
+        }
+
+        return dto;
+    }
 
     // DTO → ENTITY
-    @Mapping(source = "role", target = "role", qualifiedByName = "stringToRole")
-    @Mapping(source = "servidores", target = "servidores", qualifiedByName = "optionalToServidores")
-    Usuario toEntity(UsuarioDTO dto);
+    public Usuario toEntity(UsuarioDTO dto) {
+        if (dto == null) return null;
 
-    // Convertir Set<ServidorMV> → Optional<ServidorDTO>
-    @Named("servidoresToOptional")
-    default Optional<?> servidoresToOptional(Set<ServidorMV> servidores) {
-        if (servidores == null || servidores.isEmpty()) return Optional.empty();
-        return Optional.of(servidores.iterator().next());
-    }
+        Usuario usuario = new Usuario();
+        usuario.setId(dto.getId());
+        usuario.setNombre(dto.getNombre());
+        usuario.setEmail(dto.getEmail());
+        usuario.setActivo(dto.getActivo());
 
-    // Convertir Optional<ServidorDTO> → Set<ServidorMV>
-    @Named("optionalToServidores")
-    default Set<ServidorMV> optionalToServidores(Optional<?> optional) {
-        return Set.of();
-    }
+        // Role
+        if (dto.getRole() != null) {
+            Role role = new Role();
+            role.setNombre(Role.RoleName.valueOf(dto.getRole()));
+            usuario.setRole(role);
+        }
 
-    // Convertir String → Role
-    @Named("stringToRole")
-    default Role stringToRole(String roleName) {
-        if (roleName == null) return null;
-        Role role = new Role();
-        role.setNombre(Role.RoleName.valueOf(roleName));
-        return role;
+        // Servidores
+        // Servidores
+        if (dto.getServidores() != null && dto.getServidores().isPresent()) {
+            ServidorDTO servidorDTO = dto.getServidores().get();
+            ServidorMV servidor = servidorMapper.toEntity(servidorDTO);
+            usuario.setServidores(Set.of(servidor));
+        } else {
+            usuario.setServidores(Set.of());
+        }
+
+
+        return usuario;
     }
 }
