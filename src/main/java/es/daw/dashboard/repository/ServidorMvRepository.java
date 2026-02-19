@@ -13,7 +13,7 @@ public interface ServidorMvRepository extends JpaRepository<ServidorMV, Long> {
     Page<ServidorMV> findByTipo(ServidorMV.TipoServidor tipo, Pageable pageable);
     Optional<ServidorMV> findByNombre(String nombre);
 
-    // ⭐ NUEVO: El que te faltaba
+
     long countByTipoAndEstado(ServidorMV.TipoServidor tipo, ServidorMV.EstadoServidor estado);
 
 }

@@ -8,18 +8,17 @@ import java.time.LocalDateTime;
 public class AlertaDTO {
 
     private Long id;
-    private String categoria;    // "CRITICA", "ADVERTENCIA", "INFORMATIVA"
-    private String tipo;
-    private String mensaje;
-    private String origen;
-    private LocalDateTime fechaAlerta;
-    private Boolean activo;
+    private String categoria;        // "CRITICA", "ADVERTENCIA", "INFORMATIVA"
+    private String tipo;            // Tipo de alerta
+    private String mensaje;         // Mensaje descriptivo
+    private Boolean activo;         // Estado de la alerta
+    private LocalDateTime fechaAlerta;  // Fecha y hora de creación
 
-    // Info del servidor relacionado (si existe)
-    private Long servidorId;
-    private String servidorNombre;
-
-    // Info de la integración relacionada
+    // Sistema (Integración) relacionado
     private Long integracionId;
     private String integracionNombre;
+
+    // Servidor relacionado (opcional - puede ser null)
+    private Long servidorId;
+    private String servidorNombre;
 }

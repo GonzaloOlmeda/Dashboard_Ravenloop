@@ -24,7 +24,6 @@ public class Alerta {
     @Column(nullable = false, length = 500)
     private String mensaje;
 
-    private Integer origen;
 
     @Column(nullable = false)
     private Boolean activo = true;

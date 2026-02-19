@@ -1,0 +1,105 @@
+### 1. Obtener todas las categorías disponibles (para el desplegable)
+GET http://localhost:8080/api/alertas/categorias
+
+###
+
+### 2. Obtener todos los sistemas disponibles (para el desplegable)
+GET http://localhost:8080/api/alertas/sistemas
+
+###
+
+### 3. Crear una nueva alerta (ejemplo completo)
+POST http://localhost:8080/api/alertas
+Content-Type: application/json
+
+{
+  "categoria": "CRITICA",
+  "tipo": "CPU_HIGH",
+  "mensaje": "CPU al 95% durante 15 minutos",
+  "integracionId": 1
+}
+
+###
+
+### 4. Crear alerta con ADVERTENCIA
+POST http://localhost:8080/api/alertas
+Content-Type: application/json
+
+{
+  "categoria": "ADVERTENCIA",
+  "tipo": "MEMORY_HIGH",
+  "mensaje": "Memoria RAM al 85%",
+  "integracionId": 2
+}
+
+###
+
+### 5. Crear alerta INFORMATIVA
+POST http://localhost:8080/api/alertas
+Content-Type: application/json
+
+{
+  "categoria": "INFORMATIVA",
+  "tipo": "BACKUP_COMPLETED",
+  "mensaje": "Backup completado exitosamente",
+  "integracionId": 1
+}
+
+###
+
+### 6. Obtener todas las alertas (paginado)
+GET http://localhost:8080/api/alertas?page=0&size=10
+
+###
+
+### 7. Obtener alertas por categoría CRITICA
+GET http://localhost:8080/api/alertas/categoria?categoria=CRITICA&page=0&size=10
+
+###
+
+### 8. Obtener alertas por categoría ADVERTENCIA
+GET http://localhost:8080/api/alertas/categoria?categoria=ADVERTENCIA&page=0&size=10
+
+###
+
+### 9. Obtener alertas por fecha (formato yyyy/MM/dd)
+GET http://localhost:8080/api/alertas/fecha?fecha=2026/02/19&page=0&size=10
+
+###
+
+### 10. Intentar crear alerta sin categoría (debería dar error 400)
+POST http://localhost:8080/api/alertas
+Content-Type: application/json
+
+{
+  "tipo": "TEST",
+  "mensaje": "Test sin categoría",
+  "integracionId": 1
+}
+
+###
+
+### 11. Intentar crear alerta con categoría inválida (debería dar error 400)
+POST http://localhost:8080/api/alertas
+Content-Type: application/json
+
+{
+  "categoria": "INVALIDA",
+  "tipo": "TEST",
+  "mensaje": "Test con categoría inválida",
+  "integracionId": 1
+}
+
+###
+
+### 12. Intentar crear alerta sin sistema (debería dar error 400)
+POST http://localhost:8080/api/alertas
+Content-Type: application/json
+
+{
+  "categoria": "CRITICA",
+  "tipo": "TEST",
+  "mensaje": "Test sin sistema"
+}
+
+###

@@ -1,22 +1,27 @@
 package es.daw.dashboard.controller;
 
 import es.daw.dashboard.dto.bd.AlertaDTO;
+import es.daw.dashboard.dto.bd.AlertaRequestDTO;
+import es.daw.dashboard.dto.bd.CategoriaDTO;
+import es.daw.dashboard.dto.bd.IntegracionSimpleDTO;
 import es.daw.dashboard.entity.Alerta;
 import es.daw.dashboard.exception.BadRequestException;
+import es.daw.dashboard.repository.IntegracionRepository;
 import es.daw.dashboard.service.AlertaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/alertas")
@@ -24,27 +29,14 @@ import java.time.format.DateTimeParseException;
 public class AlertaController {
 
     private final AlertaService alertaService;
+    private final IntegracionRepository integracionRepository;
 
     @GetMapping
     public ResponseEntity<Page<AlertaDTO>> getAlertas(Pageable pageable) {
         return ResponseEntity.ok(alertaService.getAlerta(pageable, null, null, null, null));
     }
 
-    @GetMapping("/categoria")
-    public ResponseEntity<Page<AlertaDTO>> getAlertasPorCategoria(
-            @RequestParam String categoria,
-            Pageable pageable) {
 
-        Alerta.CategoriaAlerta categoriaEnum;
-        try {
-            categoriaEnum = Alerta.CategoriaAlerta.valueOf(categoria.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Categoría inválida: " + categoria +
-                    ". Valores permitidos: CRITICA, ADVERTENCIA, INFORMATIVA");
-        }
-
-        return ResponseEntity.ok(alertaService.getAlerta(pageable, categoriaEnum, null, null, null));
-    }
 
     @GetMapping("/fecha")
     public ResponseEntity<Page<AlertaDTO>> getAlertasPorFecha(
@@ -65,5 +57,40 @@ public class AlertaController {
         }
 
         return ResponseEntity.ok(alertaService.getAlerta(pageable, null, null, fechaInicio, fechaFin));
+    }
+
+    @PostMapping
+    public ResponseEntity<AlertaDTO> crearAlerta(@RequestBody AlertaRequestDTO request) {
+        AlertaDTO nuevaAlerta = alertaService.crearAlerta(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevaAlerta);
+    }
+
+    @GetMapping("/sistemas")
+    public ResponseEntity<List<IntegracionSimpleDTO>> getSistemasDisponibles() {
+        List<IntegracionSimpleDTO> sistemas = integracionRepository.findAll().stream()
+                .map(integracion -> new IntegracionSimpleDTO(
+                        integracion.getId(),
+                        integracion.getNombreSistema(),
+                        integracion.getTipo().name()
+                ))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(sistemas);
+    }
+
+    @GetMapping("/categorias")
+    public ResponseEntity<List<CategoriaDTO>> getCategoriasDisponibles() {
+        List<CategoriaDTO> categorias = Arrays.stream(Alerta.CategoriaAlerta.values())
+                .map(cat -> new CategoriaDTO(cat.name(), formatearCategoria(cat.name())))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(categorias);
+    }
+
+    private String formatearCategoria(String categoria) {
+        return switch (categoria) {
+            case "CRITICA" -> "Crítica";
+            case "ADVERTENCIA" -> "Advertencia";
+            case "INFORMATIVA" -> "Informativa";
+            default -> categoria;
+        };
     }
 }

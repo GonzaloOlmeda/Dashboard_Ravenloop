@@ -187,7 +187,6 @@ public class DataInitializer implements CommandLineRunner {
         alerta1.setCategoria(Alerta.CategoriaAlerta.CRITICA);
         alerta1.setTipo("SERVICE_DOWN");
         alerta1.setMensaje("Servicio Apache caído en SRV-WEB-01");
-        alerta1.setOrigen(1);
         alerta1.setIntegracion(zabbix);
         alerta1.setServidorMv(srv1);
         alertaRepository.save(alerta1);
@@ -197,7 +196,6 @@ public class DataInitializer implements CommandLineRunner {
         alerta2.setCategoria(Alerta.CategoriaAlerta.CRITICA);
         alerta2.setTipo("DISK_FULL");
         alerta2.setMensaje("Disco al 95% de capacidad en SRV-DB-01");
-        alerta2.setOrigen(1);
         alerta2.setIntegracion(zabbix);
         alerta2.setServidorMv(srv2);
         alertaRepository.save(alerta2);
@@ -207,7 +205,6 @@ public class DataInitializer implements CommandLineRunner {
         alerta3.setCategoria(Alerta.CategoriaAlerta.ADVERTENCIA);
         alerta3.setTipo("CPU_HIGH");
         alerta3.setMensaje("CPU al 85% durante 10 minutos en SRV-DB-01");
-        alerta3.setOrigen(1);
         alerta3.setIntegracion(zabbix);
         alerta3.setServidorMv(srv2);
         alertaRepository.save(alerta3);
@@ -217,7 +214,6 @@ public class DataInitializer implements CommandLineRunner {
         alerta4.setCategoria(Alerta.CategoriaAlerta.ADVERTENCIA);
         alerta4.setTipo("MEMORY_HIGH");
         alerta4.setMensaje("Memoria RAM al 80% en SRV-WEB-01");
-        alerta4.setOrigen(1);
         alerta4.setIntegracion(zabbix);
         alerta4.setServidorMv(srv1);
         alertaRepository.save(alerta4);
@@ -227,7 +223,6 @@ public class DataInitializer implements CommandLineRunner {
         alerta5.setCategoria(Alerta.CategoriaAlerta.INFORMATIVA);
         alerta5.setTipo("BACKUP_OK");
         alerta5.setMensaje("Backup nocturno completado correctamente");
-        alerta5.setOrigen(1);
         alerta5.setIntegracion(zabbix);
         alerta5.setServidorMv(null);
         alertaRepository.save(alerta5);
