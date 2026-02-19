@@ -26,6 +26,9 @@ public class Alerta {
 
     private Integer origen;
 
+    @Column(nullable = false)
+    private Boolean activo = true;
+
     @Column(name = "fecha_alerta")
     private LocalDateTime fechaAlerta = LocalDateTime.now();
 

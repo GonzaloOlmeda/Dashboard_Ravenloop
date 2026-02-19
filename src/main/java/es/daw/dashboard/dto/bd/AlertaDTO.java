@@ -13,6 +13,7 @@ public class AlertaDTO {
     private String mensaje;
     private String origen;
     private LocalDateTime fechaAlerta;
+    private Boolean activo;
 
     // Info del servidor relacionado (si existe)
     private Long servidorId;

@@ -22,6 +22,7 @@ public class AlertaMapper {
         dto.setMensaje(alerta.getMensaje());
         dto.setOrigen(alerta.getOrigen() != null ? alerta.getOrigen().toString() : null);
         dto.setFechaAlerta(alerta.getFechaAlerta());
+        dto.setActivo(alerta.getActivo());
 
         // Servidor relacionado
         if (alerta.getServidorMv() != null) {
