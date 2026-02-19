@@ -20,20 +20,19 @@ public class AlertaMapper {
         dto.setCategoria(alerta.getCategoria() != null ? alerta.getCategoria().name() : null);
         dto.setTipo(alerta.getTipo());
         dto.setMensaje(alerta.getMensaje());
-        dto.setOrigen(alerta.getOrigen() != null ? alerta.getOrigen().toString() : null);
-        dto.setFechaAlerta(alerta.getFechaAlerta());
         dto.setActivo(alerta.getActivo());
-
-        // Servidor relacionado
-        if (alerta.getServidorMv() != null) {
-            dto.setServidorId(alerta.getServidorMv().getId());
-            dto.setServidorNombre(alerta.getServidorMv().getNombre());
-        }
+        dto.setFechaAlerta(alerta.getFechaAlerta());
 
         // Integración relacionada
         if (alerta.getIntegracion() != null) {
             dto.setIntegracionId(alerta.getIntegracion().getId());
             dto.setIntegracionNombre(alerta.getIntegracion().getNombreSistema());
+        }
+
+        // Servidor relacionado (opcional)
+        if (alerta.getServidorMv() != null) {
+            dto.setServidorId(alerta.getServidorMv().getId());
+            dto.setServidorNombre(alerta.getServidorMv().getNombre());
         }
 
         return dto;
@@ -49,21 +48,21 @@ public class AlertaMapper {
                 Alerta.CategoriaAlerta.valueOf(dto.getCategoria()) : null);
         alerta.setTipo(dto.getTipo());
         alerta.setMensaje(dto.getMensaje());
-        alerta.setOrigen(dto.getOrigen() != null ? Integer.parseInt(dto.getOrigen()) : null);
+        alerta.setActivo(dto.getActivo());
         alerta.setFechaAlerta(dto.getFechaAlerta());
-
-        // Servidor relacionado (solo ID)
-        if (dto.getServidorId() != null) {
-            ServidorMV servidor = new ServidorMV();
-            servidor.setId(dto.getServidorId());
-            alerta.setServidorMv(servidor);
-        }
 
         // Integración relacionada (solo ID)
         if (dto.getIntegracionId() != null) {
             Integracion integracion = new Integracion();
             integracion.setId(dto.getIntegracionId());
             alerta.setIntegracion(integracion);
+        }
+
+        // Servidor relacionado (solo ID)
+        if (dto.getServidorId() != null) {
+            ServidorMV servidor = new ServidorMV();
+            servidor.setId(dto.getServidorId());
+            alerta.setServidorMv(servidor);
         }
 
         return alerta;

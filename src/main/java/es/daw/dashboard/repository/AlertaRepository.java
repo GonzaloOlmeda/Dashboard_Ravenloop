@@ -10,9 +10,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface AlertaRepository extends JpaRepository<Alerta, Long> {
 
-    @Query("SELECT a FROM Alerta a WHERE " +
+    @Query("SELECT a FROM Alerta a LEFT JOIN a.servidorMv s WHERE " +
            "(:categoria IS NULL OR a.categoria = :categoria) AND " +
-           "(:tipoServidor IS NULL OR a.servidorMv.tipo = :tipoServidor) AND " +
+           "(:tipoServidor IS NULL OR s.tipo = :tipoServidor) AND " +
            "(:fechaInicio IS NULL OR a.fechaAlerta >= :fechaInicio) AND " +
            "(:fechaFin IS NULL OR a.fechaAlerta <= :fechaFin) " +
            "ORDER BY a.fechaAlerta DESC")
