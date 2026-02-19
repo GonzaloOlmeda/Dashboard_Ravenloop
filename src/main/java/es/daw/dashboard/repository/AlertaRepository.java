@@ -8,5 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface AlertaRepository extends JpaRepository<Alerta, Long> {
     Page<Alerta> findByCategoria(Alerta.CategoriaAlerta categoria, Pageable pageable);
 
-    Page<Alerta> findByServidorMvId(Integer servidorId, Pageable pageable);
+    Page<Alerta> findByServidorMvId(Long servidorId, Pageable pageable);
+
+    long countByCategoria(Alerta.CategoriaAlerta categoria);
 }
