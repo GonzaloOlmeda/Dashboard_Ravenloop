@@ -29,9 +29,8 @@ public class AlertaMapper {
             dto.setIntegracionNombre(alerta.getIntegracion().getNombreSistema());
         }
 
-        // Servidor relacionado (opcional)
+        // Nombre del servidor a través de la relación
         if (alerta.getServidorMv() != null) {
-            dto.setServidorId(alerta.getServidorMv().getId());
             dto.setServidorNombre(alerta.getServidorMv().getNombre());
         }
 
@@ -58,12 +57,6 @@ public class AlertaMapper {
             alerta.setIntegracion(integracion);
         }
 
-        // Servidor relacionado (solo ID)
-        if (dto.getServidorId() != null) {
-            ServidorMV servidor = new ServidorMV();
-            servidor.setId(dto.getServidorId());
-            alerta.setServidorMv(servidor);
-        }
 
         return alerta;
     }

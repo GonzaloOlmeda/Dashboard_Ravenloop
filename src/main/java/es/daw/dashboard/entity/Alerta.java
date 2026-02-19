@@ -24,7 +24,6 @@ public class Alerta {
     @Column(nullable = false, length = 500)
     private String mensaje;
 
-
     @Column(nullable = false)
     private Boolean activo = true;
 
@@ -38,6 +37,7 @@ public class Alerta {
     @ManyToOne
     @JoinColumn(name = "id_servidor_mv")
     private ServidorMV servidorMv;
+
 
     public enum CategoriaAlerta {
         CRITICA, ADVERTENCIA, INFORMATIVA

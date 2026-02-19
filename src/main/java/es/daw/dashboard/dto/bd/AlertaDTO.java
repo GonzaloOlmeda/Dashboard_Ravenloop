@@ -18,7 +18,6 @@ public class AlertaDTO {
     private Long integracionId;
     private String integracionNombre;
 
-    // Servidor relacionado (opcional - puede ser null)
-    private Long servidorId;
+    // Nombre del servidor relacionado (accedido a través de la relación con ServidorMV)
     private String servidorNombre;
 }
