@@ -4,9 +4,11 @@ import es.daw.dashboard.dto.bd.AlertaDTO;
 import es.daw.dashboard.dto.bd.AlertaRequestDTO;
 import es.daw.dashboard.dto.bd.CategoriaDTO;
 import es.daw.dashboard.dto.bd.IntegracionSimpleDTO;
+import es.daw.dashboard.dto.bd.ServidorSimpleDTO;
 import es.daw.dashboard.entity.Alerta;
 import es.daw.dashboard.exception.BadRequestException;
 import es.daw.dashboard.repository.IntegracionRepository;
+import es.daw.dashboard.repository.ServidorMvRepository;
 import es.daw.dashboard.service.AlertaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,10 +32,24 @@ public class AlertaController {
 
     private final AlertaService alertaService;
     private final IntegracionRepository integracionRepository;
+    private final ServidorMvRepository servidorMvRepository;
 
     @GetMapping
-    public ResponseEntity<Page<AlertaDTO>> getAlertas(Pageable pageable) {
-        return ResponseEntity.ok(alertaService.getAlerta(pageable, null, null, null, null));
+    public ResponseEntity<Page<AlertaDTO>> getAlertas(
+            @RequestParam(required = false) String categoria,
+            Pageable pageable) {
+
+        Alerta.CategoriaAlerta categoriaEnum = null;
+        if (categoria != null && !categoria.isBlank()) {
+            try {
+                categoriaEnum = Alerta.CategoriaAlerta.valueOf(categoria.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new BadRequestException("Categoría inválida: " + categoria +
+                        ". Valores permitidos: CRITICA, ADVERTENCIA, INFORMATIVA");
+            }
+        }
+
+        return ResponseEntity.ok(alertaService.getAlerta(pageable, categoriaEnum, null, null));
     }
 
 
@@ -56,13 +72,21 @@ public class AlertaController {
                     ". Formato esperado: yyyy/MM/dd (ej: 2026/02/19)");
         }
 
-        return ResponseEntity.ok(alertaService.getAlerta(pageable, null, null, fechaInicio, fechaFin));
+        return ResponseEntity.ok(alertaService.getAlerta(pageable, null, fechaInicio, fechaFin));
     }
 
     @PostMapping
     public ResponseEntity<AlertaDTO> crearAlerta(@RequestBody AlertaRequestDTO request) {
         AlertaDTO nuevaAlerta = alertaService.crearAlerta(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevaAlerta);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<AlertaDTO> editarAlerta(
+            @PathVariable Long id,
+            @RequestBody AlertaRequestDTO request) {
+        AlertaDTO alertaActualizada = alertaService.editarAlerta(id, request);
+        return ResponseEntity.ok(alertaActualizada);
     }
 
     @GetMapping("/sistemas")
@@ -83,6 +107,18 @@ public class AlertaController {
                 .map(cat -> new CategoriaDTO(cat.name(), formatearCategoria(cat.name())))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(categorias);
+    }
+
+    @GetMapping("/servidores")
+    public ResponseEntity<List<ServidorSimpleDTO>> getServidoresDisponibles() {
+        List<ServidorSimpleDTO> servidores = servidorMvRepository.findAll().stream()
+                .map(servidor -> new ServidorSimpleDTO(
+                        servidor.getId(),
+                        servidor.getNombre(),
+                        servidor.getTipo().name()
+                ))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(servidores);
     }
 
     private String formatearCategoria(String categoria) {

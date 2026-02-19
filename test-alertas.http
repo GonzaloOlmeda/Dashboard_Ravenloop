@@ -1,54 +1,130 @@
-### 1. Obtener todas las categorías disponibles (para el desplegable)
+### 1. Obtener TODAS las alertas (sin filtros)
+GET http://localhost:8080/api/alertas
+
+###
+
+### 2. Filtrar alertas por categoría CRITICA
+GET http://localhost:8080/api/alertas?categoria=CRITICA
+
+###
+
+### 3. Filtrar alertas por categoría ADVERTENCIA
+GET http://localhost:8080/api/alertas?categoria=ADVERTENCIA
+
+###
+
+### 4. Filtrar alertas por categoría INFORMATIVA
+GET http://localhost:8080/api/alertas?categoria=INFORMATIVA
+
+###
+
+### 5. Obtener todas las categorías disponibles (para el desplegable)
 GET http://localhost:8080/api/alertas/categorias
 
 ###
 
-### 2. Obtener todos los sistemas disponibles (para el desplegable)
+### 6. Obtener todos los sistemas disponibles (para el desplegable)
 GET http://localhost:8080/api/alertas/sistemas
 
 ###
 
-### 3. Crear una nueva alerta (ejemplo completo)
+### 7. Obtener todos los servidores disponibles (para el desplegable)
+GET http://localhost:8080/api/alertas/servidores
+
+###
+
+### 8. Crear una nueva alerta CRITICA con servidor
 POST http://localhost:8080/api/alertas
 Content-Type: application/json
 
 {
   "categoria": "CRITICA",
-  "tipo": "CPU_HIGH",
-  "mensaje": "CPU al 95% durante 15 minutos",
-  "integracionId": 1
+  "tipo": "DISK_FULL",
+  "mensaje": "El disco está al 98% de capacidad",
+  "integracionId": 4,
+  "servidorNombre": "SRV-WEB-01"
 }
 
 ###
 
-### 4. Crear alerta con ADVERTENCIA
+### 9. Crear alerta ADVERTENCIA con servidor
 POST http://localhost:8080/api/alertas
 Content-Type: application/json
 
 {
   "categoria": "ADVERTENCIA",
-  "tipo": "MEMORY_HIGH",
-  "mensaje": "Memoria RAM al 85%",
-  "integracionId": 2
+  "tipo": "CPU_HIGH",
+  "mensaje": "CPU al 85% durante 10 minutos",
+  "integracionId": 4,
+  "servidorNombre": "SRV-DB-01"
 }
 
 ###
 
-### 5. Crear alerta INFORMATIVA
+### 10. Crear alerta INFORMATIVA sin servidor (general)
 POST http://localhost:8080/api/alertas
 Content-Type: application/json
 
 {
   "categoria": "INFORMATIVA",
   "tipo": "BACKUP_COMPLETED",
-  "mensaje": "Backup completado exitosamente",
-  "integracionId": 1
+  "mensaje": "Backup nocturno completado exitosamente",
+  "integracionId": 4
 }
 
 ###
 
-### 6. Obtener todas las alertas (paginado)
-GET http://localhost:8080/api/alertas?page=0&size=10
+### 11. Obtener alertas con paginación
+GET http://localhost:8080/api/alertas?page=0&size=5
+
+###
+
+### 12. Buscar alertas por fecha específica (formato: yyyy/MM/dd)
+GET http://localhost:8080/api/alertas/fecha?fecha=2026/02/19
+
+###
+
+### 13. Editar alerta existente - cambiar categoría (usar ID real)
+PUT http://localhost:8080/api/alertas/1
+Content-Type: application/json
+
+{
+  "categoria": "ADVERTENCIA",
+  "tipo": "SERVICE_DOWN",
+  "mensaje": "Servicio Apache restaurado - reducido a advertencia",
+  "integracionId": 4,
+  "servidorNombre": "SRV-WEB-01",
+  "activo": true
+}
+
+###
+
+### 14. Editar alerta - desactivar alerta
+PUT http://localhost:8080/api/alertas/2
+Content-Type: application/json
+
+{
+  "categoria": "CRITICA",
+  "tipo": "DISK_FULL",
+  "mensaje": "Disco al 95% - RESUELTO",
+  "integracionId": 4,
+  "servidorNombre": "SRV-DB-01",
+  "activo": false
+}
+
+###
+
+### 15. Editar alerta - cambiar servidor
+PUT http://localhost:8080/api/alertas/3
+Content-Type: application/json
+
+{
+  "categoria": "ADVERTENCIA",
+  "tipo": "MEMORY_HIGH",
+  "mensaje": "Memoria RAM al 80% - migrado a VM",
+  "integracionId": 4,
+  "servidorNombre": "VM-APP-01"
+}
 
 ###
 
