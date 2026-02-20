@@ -12,14 +12,18 @@ import es.daw.dashboard.repository.AlertaRepository;
 import es.daw.dashboard.repository.IntegracionRepository;
 import es.daw.dashboard.repository.ServidorMvRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AlertaService {
 
     private final AlertaRepository alertaRepository;
@@ -147,5 +151,42 @@ public class AlertaService {
         // Mantener la fecha original de la alerta, no actualizarla
         Alerta alertaActualizada = alertaRepository.save(alerta);
         return alertaMapper.toDTO(alertaActualizada);
+    }
+
+    @Transactional
+    public int eliminarAlertasInactivasAntiguas() {
+        // Calcular la fecha límite (30 días antes de ahora)
+        LocalDateTime fechaLimite = LocalDateTime.now().minusDays(30);
+
+        log.info("Buscando alertas inactivas con fecha anterior a: {}", fechaLimite);
+
+        // Primero obtener las alertas que se van a eliminar para log
+        List<Alerta> alertasAEliminar = alertaRepository.findAlertasInactivasParaEliminar(fechaLimite);
+        log.info("Encontradas {} alerta(s) candidatas para eliminar", alertasAEliminar.size());
+
+        if (!alertasAEliminar.isEmpty()) {
+            for (Alerta alerta : alertasAEliminar) {
+                log.info(" - ID: {}, Tipo: {}, Fecha: {}, Activo: {}",
+                    alerta.getId(), alerta.getTipo(), alerta.getFechaAlerta(), alerta.getActivo());
+            }
+        }
+
+        // Eliminar alertas inactivas con más de 30 días
+        int eliminadas = alertaRepository.deleteAlertasInactivas(fechaLimite);
+        log.info("Total eliminadas: {}", eliminadas);
+
+        return eliminadas;
+    }
+
+    public List<AlertaDTO> obtenerAlertasInactivasParaBorrado() {
+        // Calcular la fecha límite (30 días antes de ahora)
+        LocalDateTime fechaLimite = LocalDateTime.now().minusDays(30);
+
+        // Obtener alertas que serán eliminadas
+        List<Alerta> alertas = alertaRepository.findAlertasInactivasParaEliminar(fechaLimite);
+
+        return alertas.stream()
+                .map(alertaMapper::toDTO)
+                .toList();
     }
 }

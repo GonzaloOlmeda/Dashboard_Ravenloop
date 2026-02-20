@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -37,6 +38,9 @@ public class DataInitializer implements CommandLineRunner {
             cargarAlertas();
         }
 
+        // DESACTIVADO: No cargar alertas de prueba automáticamente
+        // Si necesitas probar el borrado automático, crea tus propias alertas inactivas
+        // cargarAlertasDePrueba();
     }
 
     private void cargarRoles() {
@@ -226,6 +230,5 @@ public class DataInitializer implements CommandLineRunner {
         alerta5.setIntegracion(zabbix);
         alerta5.setServidorMv(null);
         alertaRepository.save(alerta5);
-
     }
 }
