@@ -129,4 +129,16 @@ public class AlertaController {
             default -> categoria;
         };
     }
+
+    @DeleteMapping("/limpiar-inactivas")
+    public ResponseEntity<String> eliminarAlertasInactivas() {
+        int alertasEliminadas = alertaService.eliminarAlertasInactivasAntiguas();
+        return ResponseEntity.ok(alertasEliminadas + " alerta(s) inactiva(s) con más de 30 días eliminada(s)");
+    }
+
+    @GetMapping("/limpiar-inactivas/preview")
+    public ResponseEntity<List<AlertaDTO>> previsualizarAlertasParaBorrado() {
+        List<AlertaDTO> alertas = alertaService.obtenerAlertasInactivasParaBorrado();
+        return ResponseEntity.ok(alertas);
+    }
 }
